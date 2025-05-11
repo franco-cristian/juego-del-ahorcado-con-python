@@ -12,21 +12,25 @@ class Ahorcado():
         self.root.resizable(0, 0)
         self.root.config(bg='gray95')
         
+        # Variables del juego
         self.vidas = 6
         self.puntuacion = 0
         self.puntos_para_revelar = 100
         self.juego_activo = True
         self.letras_reveladas = 0
-        self.etapa_ahorcado = 0
+        self.etapa_ahorcado = 0  # Controla qué imagen mostrar (0-6)
         
+        # Cargar imágenes del ahorcado
         self.imagenes_ahorcado = self.cargar_imagenes()
         
+        # Cargar palabras
         self.palabras = self.cargar_palabras()
         self.longitud_palabra = randint(5, 10)
         self.palabra_actual = choice(self.palabras).upper()
         self.letras_adivinadas = ['_' for _ in self.palabra_actual]
         self.letras_intentadas = set()
         
+        # Configurar interfaz
         self.crear_interfaz()
         self.actualizar_estado()
         self.mostrar_ahorcado()
@@ -34,12 +38,14 @@ class Ahorcado():
     def cargar_imagenes(self):
         """Carga las 7 imágenes del ahorcado (0-6)"""
         imagenes = []
-
+        
+        # Crear directorio si no existe
         if not os.path.exists('recursos/imagenes'):
             os.makedirs('recursos/imagenes')
             messagebox.showwarning("Advertencia", "Directorio de imágenes no encontrado. Se creará uno vacío.")
             return []
         
+        # Cargar cada imagen
         for i in range(7):
             try:
                 ruta = f'recursos/imagenes/ahorcado_{i}.png'
@@ -63,18 +69,21 @@ class Ahorcado():
             palabras = [line.strip().upper() for line in f.readlines() if line.strip()]
         
         return palabras
+
     
     def crear_interfaz(self):
-
+        # Marco principal
         self.marco_principal = tk.Frame(self.root, bg='gray95')
         self.marco_principal.pack(padx=20, pady=10)
         
+        # Panel del ahorcado (imagen)
         self.panel_ahorcado = tk.Frame(self.marco_principal, bg='gray95')
         self.panel_ahorcado.grid(row=0, column=0, columnspan=2, pady=10)
         
         self.label_imagen = tk.Label(self.panel_ahorcado, bg='white')
         self.label_imagen.pack()
         
+        # Panel de estado
         self.panel_estado = tk.Frame(self.marco_principal, bg='gray80')
         self.panel_estado.grid(row=1, column=0, columnspan=2, pady=10, sticky='ew')
         
@@ -90,14 +99,17 @@ class Ahorcado():
                                     command=self.revelar_letra, state=tk.DISABLED)
         self.btn_revelar.pack(side=tk.LEFT, padx=10)
         
+        # Botón Reiniciar (siempre visible)
         self.btn_reiniciar = tk.Button(self.panel_estado, text='Reiniciar',
                                      command=self.reiniciar)
         self.btn_reiniciar.pack(side=tk.LEFT, padx=10)
         
+        # Botón Salir (siempre visible)
         self.btn_salir = tk.Button(self.panel_estado, text='Salir',
                                  command=self.root.destroy)
         self.btn_salir.pack(side=tk.LEFT, padx=10)
         
+        # Panel de palabra
         self.panel_palabra = tk.Frame(self.marco_principal, bg='gray95')
         self.panel_palabra.grid(row=2, column=0, columnspan=2, pady=20)
         
@@ -108,6 +120,7 @@ class Ahorcado():
             label.pack(side=tk.LEFT, padx=5)
             self.labels_letras.append(label)
         
+        # Panel de teclado
         self.panel_teclado = tk.Frame(self.marco_principal)
         self.panel_teclado.grid(row=3, column=0, columnspan=2, pady=10)
         
@@ -139,6 +152,7 @@ class Ahorcado():
         self.btn_revelar.config(text=f'Revelar letra ({self.puntos_para_revelar} pts)',
                               state=tk.NORMAL if self.puntuacion >= self.puntos_para_revelar else tk.DISABLED)
         
+        # Actualizar letras adivinadas
         for i, letra in enumerate(self.palabra_actual):
             if self.letras_adivinadas[i] != '_':
                 self.labels_letras[i].config(text=letra)
