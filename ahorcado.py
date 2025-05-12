@@ -23,10 +23,10 @@ class Ahorcado():
         # Cargar imágenes del ahorcado
         self.imagenes_ahorcado = self.cargar_imagenes()
         
-        # Cargar palabras
-        self.palabras = self.cargar_palabras()
+        # Cargar palabras según longitud (5-10 caracteres)
+        self.palabras_por_longitud = self.cargar_palabras()
         self.longitud_palabra = randint(5, 10)
-        self.palabra_actual = choice(self.palabras).upper()
+        self.palabra_actual = choice(self.palabras_por_longitud[self.longitud_palabra]).upper()
         self.letras_adivinadas = ['_' for _ in self.palabra_actual]
         self.letras_intentadas = set()
         
@@ -59,17 +59,21 @@ class Ahorcado():
         return imagenes
     
     def cargar_palabras(self):
-        archivo = 'recursos/palabras/palabras_adivinar_5.txt'
+        palabras = {i: [] for i in range(5, 11)}  # Diccionario para 5-10 letras
         
-        if not os.path.exists(archivo):
-            messagebox.showerror("Error", f"No se encontró el archivo: {archivo}")
-            sys.exit(1)
-
-        with open(archivo, 'r', encoding='utf-8') as f:
-            palabras = [line.strip().upper() for line in f.readlines() if line.strip()]
-        
+        # Cargar archivos de palabras
+        for longitud in range(5, 11):
+            archivo = f'recursos/palabras/palabras_adivinar_{longitud}.txt'
+            
+            if not os.path.exists(archivo):
+                messagebox.showerror("Error", f"No se encontró el archivo: {archivo}")
+                sys.exit(1)
+            
+            # Leer palabras del archivo
+            with open(archivo, 'r', encoding='utf-8') as f:
+                palabras[longitud] = [line.strip().upper() for line in f.readlines() if line.strip()]
+                
         return palabras
-
     
     def crear_interfaz(self):
         # Marco principal
@@ -95,8 +99,7 @@ class Ahorcado():
                                    font=('Arial', 12), bg='gray80')
         self.label_puntos.pack(side=tk.LEFT, padx=10)
         
-        self.btn_revelar = tk.Button(self.panel_estado, text=f'Revelar letra ({self.puntos_para_revelar} pts)',
-                                    command=self.revelar_letra, state=tk.DISABLED)
+        self.btn_revelar = tk.Button(self.panel_estado, text=f'Revelar letra ({self.puntos_para_revelar} pts)', command=self.revelar_letra, state=tk.DISABLED)
         self.btn_revelar.pack(side=tk.LEFT, padx=10)
         
         # Botón Reiniciar (siempre visible)
@@ -105,8 +108,7 @@ class Ahorcado():
         self.btn_reiniciar.pack(side=tk.LEFT, padx=10)
         
         # Botón Salir (siempre visible)
-        self.btn_salir = tk.Button(self.panel_estado, text='Salir',
-                                 command=self.root.destroy)
+        self.btn_salir = tk.Button(self.panel_estado, text='Salir', command=self.root.destroy)
         self.btn_salir.pack(side=tk.LEFT, padx=10)
         
         # Panel de palabra
@@ -135,8 +137,7 @@ class Ahorcado():
             marco_fila = tk.Frame(self.panel_teclado)
             marco_fila.pack()
             for letra in letras:
-                btn = tk.Button(marco_fila, text=letra, width=4, height=2,
-                              command=lambda l=letra: self.intentar_letra(l))
+                btn = tk.Button(marco_fila, text=letra, width=4, height=2, command=lambda l=letra: self.intentar_letra(l))
                 btn.pack(side=tk.LEFT, padx=2, pady=2)
                 self.botones[letra] = btn
     
@@ -149,8 +150,7 @@ class Ahorcado():
     def actualizar_estado(self):
         self.label_vidas.config(text=f'Vidas: {self.vidas}')
         self.label_puntos.config(text=f'Puntos: {self.puntuacion}')
-        self.btn_revelar.config(text=f'Revelar letra ({self.puntos_para_revelar} pts)',
-                              state=tk.NORMAL if self.puntuacion >= self.puntos_para_revelar else tk.DISABLED)
+        self.btn_revelar.config(text=f'Revelar letra ({self.puntos_para_revelar} pts)', state=tk.NORMAL if self.puntuacion >= self.puntos_para_revelar else tk.DISABLED)
         
         # Actualizar letras adivinadas
         for i, letra in enumerate(self.palabra_actual):
