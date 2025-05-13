@@ -31,7 +31,7 @@ class Ahorcado():
 
     def inicializar_juego(self):
         """Inicializa variables para una nueva partida"""
-        self.vidas = 6
+        self.vidas = 8
         self.puntuacion_actual = 0
         self.puntos_para_revelar = 100
         self.juego_activo = True
@@ -47,7 +47,7 @@ class Ahorcado():
         """Carga las 7 imágenes del ahorcado (0-6)"""
         imagenes = []
         try:
-            for i in range(7):
+            for i in range(9):
                 ruta = f'recursos/imagenes/ahorcado_{i}.png'
                 img = Image.open(ruta).resize((300, 300), Image.LANCZOS)
                 imagenes.append(ImageTk.PhotoImage(img))
@@ -236,7 +236,7 @@ class Ahorcado():
         self.actualizar_estado()
         self.juego_activo = False
         # Calcular puntos finales
-        bono_vidas = self.vidas * 50
+        bono_vidas = self.vidas * 40
         puntos_partida = self.puntuacion_actual + bono_vidas
         Ahorcado.puntuacion_total += puntos_partida
         Ahorcado.record += puntos_partida
